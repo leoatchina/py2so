@@ -99,14 +99,15 @@ Example:
                         dir_list.append(d[2:])
                     else:
                         dir_list.append(d)
-    if source_dir[-1] == r'/':
-        source_dir = source_dir[:-1]
-
     if lib_dir[-1] == r'/':
         lib_dir = lib_dir[:-1]
 
-    if output_dir[-1] == r'/':
-        output_dir = output_dir[:-1]
+    if source_dir[-1] != r'/':
+        source_dir = source_dir + r"/"
+
+
+    if output_dir[-1] != r'/':
+        output_dir = output_dir + r"/"
 
     if not py_ver in ['2', '3']:
         print('python version must be 3 or 2')
