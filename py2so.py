@@ -2,21 +2,23 @@ import os
 import sys
 import getopt
 
-def transfer(file_name):
+def transfer(dir_pref):
     ret = os.system('cython -%s %s.py;'
               'gcc -c -fPIC -I%s %s.c -o %s.o'
-              % (py_ver, file_name, lib_dir, file_name, file_name))
+              % (py_ver, dir_pref, lib_dir, dir_pref, dir_pref))
     if ret == 0:
-        ret = os.system('gcc -shared %s.o -o %s.so' % (file_name, file_name))
+        ret = os.system('gcc -shared %s.o -o %s.so' % (dir_pref, dir_pref))
     if ret != 0:
-        if ret !=130:
+        if ret == 2:
+            print("Stop compile by ctrl-c")
+        else:
             print("Compilie error, please check you have installed cython or the lib_dir is right")
         sys.exit(1)
-    print("Completed %s" % file_name)
+    print("Completed %s" % dir_pref)
     if clear:
-        os.system('rm -f %s.c %s.o %s.py' % (file_name, file_name, file_name))
+        os.system('rm -f %s.c %s.o %s.py' % (dir_pref, dir_pref, dir_pref))
     else:
-        os.system('rm -f %s.c %s.o' % (file_name, file_name))
+        os.system('rm -f %s.c %s.o' % (dir_pref, dir_pref))
 
 if __name__ == '__main__':
     help_show = '''
@@ -102,12 +104,11 @@ Example:
     if lib_dir[-1] == r'/':
         lib_dir = lib_dir[:-1]
 
-    if source_dir[-1] != r'/':
-        source_dir = source_dir + r"/"
+    if source_dir[-1] == r'/':
+        source_dir = source_dir[-1]
 
-
-    if output_dir[-1] != r'/':
-        output_dir = output_dir + r"/"
+    if output_dir[-1] == r'/':
+        output_dir = output_dir[-1]
 
     if not py_ver in ['2', '3']:
         print('python version must be 3 or 2')
@@ -132,7 +133,8 @@ Example:
             except Exception as err:
                 print("Cannot mkdir -p %s" % output_dir)
                 sys.exit(1)
-        os.system('cp -r %s %s' % (source_dir, output_dir))
+
+        os.system("rsync -ah %s/ %s/" % (source_dir, output_dir))
         if clear:
             try:
                 os.system("rm -rf %s/.git*" % output_dir)
@@ -144,8 +146,8 @@ Example:
                     if m_list != '':
                         skip_flag = 0
                         if dir_flag == 1:
-                            for dir in dir_list:
-                                if (root+'/').startswith(source_dir + '/' + dir):
+                            for each_dir in dir_list:
+                                if (root+'/').startswith(output_dir + '/' + each_dir):
                                     skip_flag = 1
                                     break
                             if skip_flag:
