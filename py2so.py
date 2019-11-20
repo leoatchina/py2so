@@ -1,16 +1,22 @@
+import os
+import sys
 import getopt
-import os, sys
 
-
-def transfer(dir_pref):
-    os.system('cython -2 %s.py;'
-              'gcc -c -fPIC -I/usr/include/python2.%s/ %s.c -o %s.o'
-              % (dir_pref, p_subv, dir_pref, dir_pref))
-    os.system('gcc -shared %s.o -o %s.so' % (dir_pref, dir_pref))
+def transfer(file_name):
+    ret = os.system('cython -%s %s.py;'
+              'gcc -c -fPIC -I%s %s.c -o %s.o'
+              % (py_ver, file_name, lib_dir, file_name, file_name))
+    if ret == 0:
+        ret = os.system('gcc -shared %s.o -o %s.so' % (file_name, file_name))
+    if ret != 0:
+        if ret !=130:
+            print("Compilie error, please check you have installed cython or the lib_dir is right")
+        sys.exit(1)
+    print("Completed %s" % file_name)
     if clear:
-        os.system('rm -f %s.c %s.o %s.py' % (dir_pref, dir_pref, dir_pref))
+        os.system('rm -f %s.c %s.o %s.py' % (file_name, file_name, file_name))
     else:
-        os.system('rm -f %s.c %s.o' % (dir_pref, dir_pref))
+        os.system('rm -f %s.c %s.o' % (file_name, file_name))
 
 if __name__ == '__main__':
     help_show = '''
@@ -23,26 +29,30 @@ Usage: python py2so.py [options] ...
 Options:
   -v,  --version    Show the version of the py2so
   -h,  --help       Show the help info
-  -p,  --py         Python subversion, default value == 7
-                    Example: -p 7  (means you use python2.7)
+  -p,  --py         Python version, default value is 3
+                    Example: -p 2  (means you use python2)
+  -l,  --lib        python libray for compile, must be offered
   -d,  --directory  Directory of your project (if use -d, you change the whole directory)
   -f,  --file       File to be transfered (if use -f, you only change one file)
-  -c,  --clear      Clear the origin .py
+  -o,  --output     Directory to store the compile results, default "./output"
+  -c,  --clear      Clear the origin .py and .git directory
                     (Warning: the option will delete the .py, but don't be so serious, py2so will give the project a copy)
   -m,  --maintain   List the file or the directory you don't want to transfer
-                    Note: The directories should be surrounded by '[]', and must be the relative path to -d's value 
+                    Note: The directories should be surrounded by '[]', and must be the relative path to -d's value
                     Example: -m __init__.py,setup.py,[poc,resource,venv,interface]
 Example:
   python py2so.py -f test_file.py
   python py2so.py -d test_dir -m __init__.py,setup.py,[poc/,resource/,venv/,interface/] -c
     '''
-    clear = 0
-    p_subv = '7'
-    root_name = ''
-    file_name = ''
-    m_list = ''
+    clear      = 0
+    py_ver     = '3'
+    source_dir = ''
+    file_name  = ''
+    m_list     = ''
+    lib_dir    = ''
+    output_dir = './output'
     try:
-        options,args = getopt.getopt(sys.argv[1:],"vhp:d:f:cm:",["version","help","py=","directory=","file=","clear","maintain="])
+        options,args = getopt.getopt(sys.argv[1:],"vhcp:l:o:d:f:m:",["version","help","clear","lib=","py=","directory=","file=","output=","maintain="])
     except getopt.GetoptError:
         print('Get options Error')
         print(help_show)
@@ -52,13 +62,17 @@ Example:
         if key in ['-h', '--help']:
             print(help_show)
         elif key in ['-v', '--version']:
-            print('py2so version 0.0.1')
-        elif key in ['-p', '--py']:
-            p_subv = value
+            print('py2so version 0.0.2')
         elif key in ['-c', '--clear']:
             clear = 1
+        elif key in ['-p', '--py']:
+            p_subv = value
+        elif key in ['-l', '--lib']:
+            lib_dir = value
+        elif key in ['-o', '--output']:
+            output_dir = value
         elif key in ['-d', '--directory']:
-            root_name = value
+            source_dir = value
         elif key in ['-f', '--file']:
             file_name = value
         elif key in ['-m', '--maintain']:
@@ -85,22 +99,52 @@ Example:
                         dir_list.append(d[2:])
                     else:
                         dir_list.append(d)
+    if source_dir[-1] == r'/':
+        source_dir = source_dir[:-1]
 
-    if root_name != '':
-        if not os.path.exists(root_name):
+    if lib_dir[-1] == r'/':
+        lib_dir = lib_dir[:-1]
+
+    if output_dir[-1] == r'/':
+        output_dir = output_dir[:-1]
+
+    if not py_ver in ['2', '3']:
+        print('python version must be 3 or 2')
+        sys.exit(1)
+    if not os.path.isdir(lib_dir):
+        print('lib_dir must be given, useing -l or --lib')
+        sys.exit(1)
+
+    if source_dir != '':
+        if not os.path.exists(source_dir):
             print('No such Directory, please check or use the Absolute Path')
             sys.exit(1)
-        if os.path.exists('%s_old' % root_name):
-            os.system('rm -rf %s_old' % root_name)
-        os.system('cp -r %s %s_old' % (root_name, root_name))
+        if os.path.exists(output_dir):
+            try:
+                os.system('rm -rf %s' % output_dir)
+            except Exception as err:
+                print("Cannot rm -rf %s" % output_dir)
+                sys.exit(1)
+        else:
+            try:
+                os.system('mkdir -p %s' % output_dir)
+            except Exception as err:
+                print("Cannot mkdir -p %s" % output_dir)
+                sys.exit(1)
+        os.system('cp -r %s %s' % (source_dir, output_dir))
+        if clear:
+            try:
+                os.system("rm -rf %s/.git*" % output_dir)
+            except Exception as e:
+                pass
         try:
-            for root, dirs, files in os.walk(root_name):
+            for root, dirs, files in os.walk(output_dir):
                 for file in files:
                     if m_list != '':
                         skip_flag = 0
                         if dir_flag == 1:
                             for dir in dir_list:
-                                if (root+'/').startswith(root_name + '/' + dir):
+                                if (root+'/').startswith(source_dir + '/' + dir):
                                     skip_flag = 1
                                     break
                             if skip_flag:
@@ -118,12 +162,16 @@ Example:
                         transfer(dir_pref)
         except Exception as err:
             print(err)
-            if "Python.h" in str(err):
+            if "Python.h" in err:
                 print("Please check out the Python version You use, and use option -p to specify the definite version")
+                sys.exit(1)
+        else:
+            print('All finished')
     if file_name != '':
         try:
             dir_pref = file_name.split('.')[0]
             transfer(dir_pref)
         except Exception as err:
             print(err)
-
+        else:
+            print('All finished')
