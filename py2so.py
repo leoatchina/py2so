@@ -121,20 +121,14 @@ Example:
         if not os.path.exists(source_dir):
             print('No such Directory, please check or use the Absolute Path')
             sys.exit(1)
-        if os.path.exists(output_dir):
-            try:
-                os.system('rm -rf %s' % output_dir)
-            except Exception as err:
-                print("Cannot rm -rf %s" % output_dir)
-                sys.exit(1)
-        else:
+        if not os.path.exists(output_dir):
             try:
                 os.system('mkdir -p %s' % output_dir)
             except Exception as err:
                 print("Cannot mkdir -p %s" % output_dir)
                 sys.exit(1)
 
-        os.system("rsync -ah %s/ %s/" % (source_dir, output_dir))
+        os.system("rsync -azP --delete %s/ %s/" % (source_dir, output_dir))
         if clear:
             try:
                 os.system("rm -rf %s/.git*" % output_dir)
