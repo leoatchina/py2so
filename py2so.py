@@ -20,6 +20,7 @@ def transfer(dir_pref):
     else:
         os.system('rm -f %s.c %s.o' % (dir_pref, dir_pref))
 
+
 if __name__ == '__main__':
     help_show = '''
 py2so is tool to change the .py to .so, you can use it to hide the source code of py
