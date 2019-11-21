@@ -27,7 +27,6 @@ py2so needs the environment of python2
 Usage: python py2so.py [options] ...
 
 Options:
-  -v,  --version    Show the version of the py2so
   -h,  --help       Show the help info
   -p,  --py         Python version, default value is 3
                     Example: -p 2  (means you use python2)
@@ -49,7 +48,7 @@ Example:
     lib_dir    = ''
     output_dir = './output'
     try:
-        options,args = getopt.getopt(sys.argv[1:],"vhp:l:o:d:f:m:",["version","help","lib=","py=","directory=","file=","output=","maintain="])
+        options,args = getopt.getopt(sys.argv[1:],"hp:l:o:d:f:m:",["help","lib=","py=","directory=","file=","output=","maintain="])
     except getopt.GetoptError:
         print('Get options Error')
         print(help_show)
@@ -58,8 +57,7 @@ Example:
     for key, value in options:
         if key in ['-h', '--help']:
             print(help_show)
-        elif key in ['-v', '--version']:
-            print('py2so version 0.0.2')
+            sys.exit(0)
         elif key in ['-p', '--py']:
             p_subv = value
         elif key in ['-l', '--lib']:

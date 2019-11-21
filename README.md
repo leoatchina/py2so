@@ -35,7 +35,6 @@ sudo bash install_cython.sh
 
 选项:
 ```
-  -v,  --version    显示py2so版本
   -h,  --help       显示帮助菜单
   -l,  --lib        指定要include的python库文件,必填。这个是和源文件的重要区别之一
   -p,  --py         Python的子版本号, 默认值为 3。 次重要区别
