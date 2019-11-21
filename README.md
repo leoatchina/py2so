@@ -1,6 +1,7 @@
 # py2so
 
 从[https://github.com/cckuailong/py2so](https://github.com/cckuailong/py2so) fork 并根据自己的需要进行了改动
+主要是指定库库文件目录，以及指定是哪个大版本的python
 
 ## 例子
 ```
@@ -18,21 +19,20 @@ python py2so -c -l ~/anaconda3/include/python3.6m -d ~/source/server -o ~/releas
 7. 可以指定用python2或者python3，默认是 python3
 8. 碰到无法编译的情况会退出
 
-## 环境配置
+## 安装cython
 ```
 sudo bash install_cython.sh
 ```
 安装cython
 
 ## 使用说明
-#### Python
+
 ```
-使用:
   python py2so.py [选项] ...
 ```
 
-```
 选项:
+```
   -v,  --version    显示py2so版本
   -h,  --help       显示帮助菜单
   -l,  --lib        指定要include的python库文件,必填。这个是和源文件的重要区别之一
@@ -42,14 +42,14 @@ sudo bash install_cython.sh
   -d,  --directory  Python项目路径 (如果使用-d参数, 将加密整个Python项目)
   -f,  --file       Python文件 (如果使用-f, 将加密单个Python文件)
                     -d 或 -f 必填
-  -o,  --output     指定输出目录，如果不存在会自动建立
+  -o,  --output     指定输出目录，如果不存在会自动建立。默认是当前目录下的.output文件夹
   -m,  --maintain   标记你不想加密的文件或文件夹路径
                     注意: 文件夹路径需要使用'[]'包起来, 并且需要和-d参数一起使用
                     例: -m __init__.py,setup.py,[poc,resource,venv,interface]
 ```
 
-```
 例:
+```
   python py2so.py -f test_file.py
   python py2so.py -d ../test_dir -m __init__.py -c
   python py2so.py -d /home/test/test_dir -m [poc/,resource/,venv/,interface/]
