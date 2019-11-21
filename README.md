@@ -1,12 +1,13 @@
 # py2so
+为了加密做出来的项目，原来用Pyinstaller但是发现完全没加密，
 
-从[https://github.com/cckuailong/py2so](https://github.com/cckuailong/py2so) fork 并根据自己的需要进行了改动
+后来找到了[https://github.com/cckuailong/py2so](https://github.com/cckuailong/py2so)， fork 后根据自己的需要进行了改动
 
-主要是指定库文件目录，以及指定是哪个大版本的python
+主要是指定库文件目录，以及指定是哪个大版本的python。
 
 ## 例子
 ```
-python py2so -c -l ~/anaconda3/include/python3.6m -d ~/source/server -o ~/release/server -m server.py
+python py2so.py -c -l ~/anaconda3/include/python3.6m -d ~/source/server -o ~/release/server -m server.py
 ```
 会先把`~/source/server`里的全部文件同步到`~/release/server`，然后把除了`server.py`外的所有py文件编译成`.so`文件
 
