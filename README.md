@@ -1,7 +1,8 @@
 # py2so
 
 从[https://github.com/cckuailong/py2so](https://github.com/cckuailong/py2so) fork 并根据自己的需要进行了改动
-主要是指定库库文件目录，以及指定是哪个大版本的python
+
+主要是指定库文件目录，以及指定是哪个大版本的python
 
 ## 例子
 ```
