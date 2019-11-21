@@ -16,11 +16,10 @@ python py2so.py -l ~/anaconda3/include/python3.6m -d ~/source/server -o ~/releas
 2. py2so加密一个py文件，也可以直接加密一整个python项目
 3. 生成的.so文件可以被主文件通过 "from module import \*" 调用
 4. 可以自动识别项目中的py文件,可以指定哪些文件或文件夹不被加密
-5. 你可以选择是否保留加密前的文件或项目
+5. 强制在目标文件夹删除加密过的py文件
 6. 采用了把源文件目录同步到指定输出文件夹的方式，默认是 "./output"
 7. 可以指定用python2或者python3，默认是 python3
-8. 强制在目标文件夹删除py文件
-9. 碰到无法编译的情况会退出
+8. 碰到无法编译的情况会退出
 
 ## 安装cython
 ```
