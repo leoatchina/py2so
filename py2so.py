@@ -32,6 +32,8 @@ Options:
                     Example: -p 2  (means you use python2)
   -l,  --lib        python libray for compile, must be offered
   -d,  --directory  Directory of your project (if use -d, you change the whole directory)
+  -e,  --exclude    Directories or files that you do not want to sync to output file
+                    dirs __pycache__, .vscode, .git, .idea will always not be synced
   -f,  --file       File to be transfered (if use -f, you only change one file)
   -o,  --output     Directory to store the compile results, default "./output"
   -m,  --maintain   List the file or the directory you don't want to transfer
@@ -41,14 +43,15 @@ Example:
   python py2so.py -f test_file.py
   python py2so.py -d test_dir -m __init__.py,setup.py,[poc/,resource/,venv/,interface/]
     '''
-    py_ver     = '3'
-    source_dir = ''
-    file_name  = ''
-    m_list     = ''
-    lib_dir    = ''
-    output_dir = './output'
+    py_ver       = '3'
+    source_dir   = ''
+    file_name    = ''
+    m_list       = ''
+    lib_dir      = ''
+    exclude_list = []
+    output_dir   = './output'
     try:
-        options,args = getopt.getopt(sys.argv[1:],"hp:l:o:d:f:m:",["help","lib=","py=","directory=","file=","output=","maintain="])
+        options,args = getopt.getopt(sys.argv[1:],"hp:l:o:d:f:m:e:",["help","py=","lib=","file=","output=","directory=","maintain=","exclude="])
     except getopt.GetoptError:
         print('Get options Error')
         print(help_show)
@@ -68,6 +71,8 @@ Example:
             source_dir = value
         elif key in ['-f', '--file']:
             file_name = value
+        elif key in ['-e', '--exclude']:
+            exclude_list = value.split(",")
         elif key in ['-m', '--maintain']:
             m_list = value
             file_flag = 0
@@ -92,6 +97,10 @@ Example:
                         dir_list.append(d[2:])
                     else:
                         dir_list.append(d)
+    exclude_list = set(['.git', '.vscode', '.idea', '__pycache__'] + exclude_list)
+    exclude_list = "'"+ "', '".join(exclude_list) + "'"
+    print(exclude_list)
+    sys.exit(1)
 
     if lib_dir[-1] == r'/':
         lib_dir = lib_dir[:-1]
@@ -124,7 +133,10 @@ Example:
             except Exception:
                 print("Cannot mkdir -p %s" % output_dir)
                 sys.exit(1)
-        os.system("rsync -azP --exclude={'.git', '.gitignore', '.vscode', '.idea', '__pycache__', 'build', 'dist'} --delete %s/ %s/" % (source_dir, output_dir))
+        os.system("rsync -azP ",
+                  "--exclude={%s} " % exclude_list,
+                  "--delete %s/ %s/" % (source_dir, output_dir))
+
         try:
             for root, dirs, files in os.walk(output_dir):
                 for file in files:
