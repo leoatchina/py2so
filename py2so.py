@@ -2,10 +2,11 @@ import os
 import sys
 import getopt
 
+
 def transfer(dir_pref):
     ret = os.system('cython -%s %s.py;'
-              'gcc -c -fPIC -I%s %s.c -o %s.o'
-              % (py_ver, dir_pref, lib_dir, dir_pref, dir_pref))
+                    'gcc -c -fPIC -I%s %s.c -o %s.o'
+                    % (py_ver, dir_pref, lib_dir, dir_pref, dir_pref))
     if ret == 0:
         ret = os.system('gcc -shared %s.o -o %s.so' % (dir_pref, dir_pref))
     if ret != 0:
@@ -51,7 +52,7 @@ Example:
     exclude_list = []
     output_dir   = './output'
     try:
-        options,args = getopt.getopt(sys.argv[1:],"hp:l:o:d:f:m:e:",["help","py=","lib=","file=","output=","directory=","maintain=","exclude="])
+        options, args = getopt.getopt(sys.argv[1:], "hp:l:o:d:f:m:e:", ["help", "py=", "lib=", "file=", "output=", "directory=", "maintain=", "exclude="])
     except getopt.GetoptError:
         print('Get options Error')
         print(help_show)
@@ -98,7 +99,7 @@ Example:
                     else:
                         dir_list.append(d)
     exclude_list = set(['.git', '.vscode', '.idea', '__pycache__'] + exclude_list)
-    exclude_list = "'"+ "', '".join(exclude_list) + "'"
+    exclude_list = "'" + "', '".join(exclude_list) + "'"
 
     if lib_dir[-1] == r'/':
         lib_dir = lib_dir[:-1]
@@ -117,7 +118,7 @@ Example:
         print("Source dir equals output dir!")
         sys.exit(1)
 
-    if not py_ver in ['2', '3']:
+    if py_ver not in ['2', '3']:
         print('python version must be 3 or 2')
         sys.exit(1)
 
@@ -134,7 +135,6 @@ Example:
         os.system("rsync -azP ",
                   "--exclude={%s} " % exclude_list,
                   "--delete %s/ %s/" % (source_dir, output_dir))
-
         try:
             for root, dirs, files in os.walk(output_dir):
                 for file in files:
