@@ -1,3 +1,6 @@
 output
-*.pyc
+*.py[c|d]
 __pycache__
+*.tasks
+*.idea
+*.vscode
