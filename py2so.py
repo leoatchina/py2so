@@ -6,6 +6,7 @@ import pandas as pd
 
 
 
+
 def transfer(dir_pref):
     ret = os.system('cython -%s %s.py;'
                     'gcc -c -fPIC -I%s %s.c -o %s.o'
@@ -135,9 +136,7 @@ Example:
             except Exception:
                 print("Cannot mkdir -p %s" % output_dir)
                 sys.exit(1)
-        os.system("rsync -azP ",
-                  "--exclude={%s} " % exclude_list,
-                  "--delete %s/ %s/" % (source_dir, output_dir))
+        os.system("rsync -azP --exclude={%s} --delete %s/ %s/" % (exclude_list, source_dir, output_dir))
         try:
             for root, dirs, files in os.walk(output_dir):
                 for file in files:
