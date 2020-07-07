@@ -1,10 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# File              : py2so.py
+# Author            : taotao <taotao@myhexin.com>
+# Date              : 2020.07.07
+# Last Modified Date: 2020.07.07
+# Last Modified By  : taotao <taotao@myhexin.com>
 import os
 import sys
 import getopt
 import pandas as pd
-
-
-
 
 
 def transfer(dir_pref):
